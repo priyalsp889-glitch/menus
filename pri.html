@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Menu Generator Pro</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .sidebar {
+            width: 350px;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 20px;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #007bff, #6f42c1);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .section {
+            margin-bottom: 30px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-content {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+            font-family: monospace;
+        }
+
+        .grid-layout {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .grid-option {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .grid-option.active {
+            border-color: #007bff;
+            background: #f0f8ff;
+        }
+
+        .grid-option i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .grid-option.active i {
+            color: #007bff;
+        }
+
+        .theme-presets {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .theme-preset {
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            background: white;
+        }
+
+        .theme-preset.active {
+            border-color: #007bff;
+            box-shadow: 0 2px 8px rgba(0,123,255,0.2);
+        }
+
+        .theme-colors {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+
+        .theme-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .custom-colors {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .color-input-group {
+            text-align: center;
+        }
+
+        .color-input {
+            width: 60px;
+            height: 40px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(45deg, #28a745, #20c997);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .preview-container {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: auto;
+            position: relative;
+        }
+
+        .preview-header {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-content {
+            padding: 40px;
+            min-height: 600px;
+        }
+
+        .menu-preview {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .menu-header {
+            text-align: center;
+            padding: 40px 30px;
+            background: var(--primary-color, #8B4513);
+            color: var(--header-text-color, white);
+            position: relative;
+        }
+
+        .menu-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--header-pattern, none);
+            opacity: 0.1;
+        }
+
+        .restaurant-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .restaurant-tagline {
+            font-size: 1.2rem;
+            font-style: italic;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .restaurant-info {
+            font-size: 0.95rem;
+            opacity: 0.8;
+        }
+
+        .menu-content {
+            padding: 40px;
+            background: var(--background-color, #faf9f7);
+        }
+
+        .menu-grid {
+            display: grid;
+            gap: 40px;
+        }
+
+        .menu-grid.cols-1 {
+            grid-template-columns: 1fr;
+        }
+
+        .menu-grid.cols-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .menu-grid.cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .menu-grid.cols-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .menu-section {
+            break-inside: avoid;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--section-title-color, #8B4513);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--accent-color, #D2691E);
+            position: relative;
+        }
+
+        .section-title::before {
+            content: '🍽️';
+            margin-right: 10px;
+        }
+
+        .menu-item {
+            display: flex;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .item-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 2px solid var(--accent-color, #D2691E);
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--item-name-color, #333);
+            margin-bottom: 5px;
+        }
+
+        .item-description {
+            font-size: 0.9rem;
+            color: var(--item-description-color, #666);
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .item-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--price-color, #e74c3c);
+            float: right;
+        }
+
+        .compact .menu-item {
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .compact .item-image {
+            width: 60px;
+            height: 60px;
+            margin-right: 12px;
+        }
+
+        .compact .item-name {
+            font-size: 1.1rem;
+        }
+
+        .compact .item-description {
+            font-size: 0.85rem;
+        }
+
+        .compact .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .file-upload {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .file-upload:hover {
+            border-color: #007bff;
+            background: #f0f8ff;
+        }
+
+        .file-upload.dragover {
+            border-color: #28a745;
+            background: #f0fff0;
+        }
+
+        .file-upload i {
+            font-size: 3rem;
+            color: #666;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .template-option {
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            background: white;
+        }
+
+        .template-option.active {
+            border-color: #007bff;
+            background: #f0f8ff;
+        }
+
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #333;
+            border-top: 5px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .menu-grid.cols-2,
+            .menu-grid.cols-3,
+            .menu-grid.cols-4 {
+                grid-template-columns: 1fr;
+            }
+            
+            .theme-presets {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Theme Styles */
+        .theme-elegant-classic {
+            --primary-color: #8B4513;
+            --secondary-color: #D2691E;
+            --background-color: #FFF8DC;
+            --accent-color: #CD853F;
+            --header-text-color: #FFFFFF;
+            --section-title-color: #8B4513;
+            --item-name-color: #654321;
+            --item-description-color: #8B7355;
+            --price-color: #B8860B;
+        }
+
+        .theme-modern-blue {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --background-color: #f0f9ff;
+            --accent-color: #60a5fa;
+            --header-text-color: #ffffff;
+            --section-title-color: #1e40af;
+            --item-name-color: #1e293b;
+            --item-description-color: #64748b;
+            --price-color: #2563eb;
+        }
+
+        .theme-rustic-warm {
+            --primary-color: #92400e;
+            --secondary-color: #f59e0b;
+            --background-color: #fef3c7;
+            --accent-color: #fbbf24;
+            --header-text-color: #ffffff;
+            --section-title-color: #92400e;
+            --item-name-color: #451a03;
+            --item-description-color: #78350f;
+            --price-color: #d97706;
+        }
+
+        .theme-luxury-gold {
+            --primary-color: #a16207;
+            --secondary-color: #eab308;
+            --background-color: #fffbeb;
+            --accent-color: #facc15;
+            --header-text-color: #ffffff;
+            --section-title-color: #a16207;
+            --item-name-color: #451a03;
+            --item-description-color: #78350f;
+            --price-color: #ca8a04;
+        }
+
+        .theme-fresh-green {
+            --primary-color: #166534;
+            --secondary-color: #22c55e;
+            --background-color: #f0fdf4;
+            --accent-color: #4ade80;
+            --header-text-color: #ffffff;
+            --section-title-color: #15803d;
+            --item-name-color: #14532d;
+            --item-description-color: #16a34a;
+            --price-color: #059669;
+        }
+
+        .theme-oceanic {
+            --primary-color: #0c4a6e;
+            --secondary-color: #0891b2;
+            --background-color: #ecfeff;
+            --accent-color: #22d3ee;
+            --header-text-color: #ffffff;
+            --section-title-color: #0e7490;
+            --item-name-color: #164e63;
+            --item-description-color: #0891b2;
+            --price-color: #0284c7;
+        }
+
+        .theme-sunset {
+            --primary-color: #dc2626;
+            --secondary-color: #f97316;
+            --background-color: #fef2f2;
+            --accent-color: #fb923c;
+            --header-text-color: #ffffff;
+            --section-title-color: #dc2626;
+            --item-name-color: #7f1d1d;
+            --item-description-color: #b91c1c;
+            --price-color: #ea580c;
+        }
+
+        .theme-royal-purple {
+            --primary-color: #581c87;
+            --secondary-color: #8b5cf6;
+            --background-color: #faf5ff;
+            --accent-color: #a78bfa;
+            --header-text-color: #ffffff;
+            --section-title-color: #6b21a8;
+            --item-name-color: #3b0764;
+            --item-description-color: #7c3aed;
+            --price-color: #7c2d12;
+        }
+
+        .theme-monochrome {
+            --primary-color: #374151;
+            --secondary-color: #6b7280;
+            --background-color: #f9fafb;
+            --accent-color: #9ca3af;
+            --header-text-color: #ffffff;
+            --section-title-color: #374151;
+            --item-name-color: #111827;
+            --item-description-color: #4b5563;
+            --price-color: #1f2937;
+        }
+
+        .theme-vintage {
+            --primary-color: #7c2d12;
+            --secondary-color: #ea580c;
+            --background-color: #fef7ed;
+            --accent-color: #fb923c;
+            --header-text-color: #ffffff;
+            --section-title-color: #9a3412;
+            --item-name-color: #431407;
+            --item-description-color: #c2410c;
+            --price-color: #dc2626;
+        }
+
+        /* Template Styles */
+        /* Classic Template */
+        .template-classic .menu-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 0;
+        }
+
+        .template-classic .menu-item {
+            border-left: 4px solid var(--accent-color);
+            border-radius: 6px;
+        }
+
+        .template-classic .section-title {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        /* Modern Template */
+        .template-modern .menu-header {
+            background: var(--primary-color);
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%);
+            padding-bottom: 60px;
+        }
+
+        .template-modern .menu-item {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .template-modern .section-title {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            border: none;
+            font-weight: 700;
+        }
+
+        .template-modern .item-image {
+            border-radius: 12px;
+        }
+
+        /* Elegant Template */
+        .template-elegant .menu-header {
+            background: var(--primary-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .template-elegant .menu-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" patternUnits="userSpaceOnUse" x="0" y="0" width="100" height="100"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
+            opacity: 0.3;
+        }
+
+        .template-elegant .section-title {
+            position: relative;
+            text-align: center;
+            font-family: 'Georgia', serif;
+            font-style: italic;
+        }
+
+        .template-elegant .section-title::before {
+            content: '✦';
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-color);
+        }
+
+        .template-elegant .section-title::after {
+            content: '✦';
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-color);
+        }
+
+        .template-elegant .menu-item {
+            border: 1px solid var(--accent-color);
+            border-radius: 0;
+            background: linear-gradient(145deg, #ffffff, #fafafa);
+        }
+
+        /* Casual Template */
+        .template-casual .menu-header {
+            background: var(--primary-color);
+            transform: rotate(-1deg);
+            margin: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .template-casual .menu-content {
+            transform: rotate(1deg);
+            margin: 20px;
+        }
+
+        .template-casual .menu-item {
+            transform: rotate(-0.5deg);
+            margin: 15px 5px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: #fff;
+        }
+
+        .template-casual .menu-item:nth-child(even) {
+            transform: rotate(0.5deg);
+        }
+
+        .template-casual .section-title {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: var(--primary-color);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            border: none;
+            background: var(--accent-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            transform: rotate(-2deg);
+        }
+
+        /* Fine Dining Template */
+        .template-fine-dining .menu-header {
+            background: linear-gradient(45deg, #000, #333);
+            color: #fff;
+            position: relative;
+        }
+
+        .template-fine-dining .menu-header::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 10px solid #333;
+        }
+
+        .template-fine-dining .section-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 400;
+            font-size: 2.2rem;
+            text-align: center;
+            color: #333;
+            border: none;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .template-fine-dining .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background: var(--accent-color);
+        }
+
+        .template-fine-dining .menu-item {
+            border: none;
+            border-bottom: 1px solid #eee;
+            border-radius: 0;
+            padding: 20px 0;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .template-fine-dining .item-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+        }
+
+        .template-fine-dining .item-price {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+        }
+
+        /* Cafe Template */
+        .template-cafe .menu-header {
+            background: linear-gradient(135deg, #8B4513, #D2691E);
+            border-radius: 0 0 50% 50% / 0 0 20px 20px;
+        }
+
+        .template-cafe .section-title {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            border: none;
+        }
+
+        .template-cafe .menu-item {
+            background: #f9f9f9;
+            border: 2px dashed var(--accent-color);
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .template-cafe .item-image {
+            border: 3px solid var(--accent-color);
+            border-radius: 50%;
+        }
+
+        /* Minimalist Template */
+        .template-minimalist .menu-header {
+            background: #fff;
+            color: #333;
+            border-bottom: 1px solid #eee;
+        }
+
+        .template-minimalist .menu-content {
+            background: #fff;
+        }
+
+        .template-minimalist .section-title {
+            font-weight: 300;
+            font-size: 1.6rem;
+            color: #333;
+            border: none;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .template-minimalist .menu-item {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #f5f5f5;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 15px 0;
+        }
+
+        .template-minimalist .item-image {
+            border: none;
+            border-radius: 0;
+        }
+
+        /* Bold Template */
+        .template-bold .menu-header {
+            background: var(--primary-color);
+            transform: skew(-2deg);
+            margin: 0 -20px;
+            padding: 40px 50px;
+        }
+
+        .template-bold .menu-content {
+            background: var(--background-color);
+        }
+
+        .template-bold .section-title {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px 25px;
+            margin: 0 -40px 30px -40px;
+            transform: skew(2deg);
+            font-weight: 900;
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: none;
+        }
+
+        .template-bold .menu-item {
+            background: white;
+            border: 3px solid var(--accent-color);
+            border-radius: 0;
+            box-shadow: 5px 5px 0 var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .template-bold .item-name {
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .template-bold .item-price {
+            background: var(--accent-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: 900;
+        }
+
+        /* PDF Print Styles */
+        @media print {
+            body {
+                background: white !important;
+            }
+            
+            .menu-section {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
+            .menu-item {
+                page-break-inside: avoid;
+                break-inside: avoid;
+                margin-bottom: 15px;
+            }
+            
+            .section-title {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+            
+            .menu-header {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+            
+            .menu-grid.cols-3,
+            .menu-grid.cols-4 {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .menu-grid.cols-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <!-- Menu Content Section -->
+            <div class="section">
+                <div class="section-header">
+                    <i class="fas fa-file-alt"></i>
+                    Menu Content
+                </div>
+                <div class="section-content">
+                    <div class="file-upload" id="csvUpload">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p><strong>Upload CSV File</strong></p>
+                        <p>Drag & drop your CSV file here or click to browse</p>
+                        <input type="file" id="csvFile" accept=".csv" style="display: none;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Enter menu data (any format)</label>
+                        <textarea class="form-control" id="menuData" placeholder="Enter menu data in JSON, CSV, or plain text format...">
+{
+  "restaurant": {
+    "name": "The Hungry Fork",
+    "tagline": "Where flavor meets comfort",
+    "address": "123 Main Street, Springfield, USA",
+    "phone": "(555) 123-4567"
+  },
+  "categories": [
+    {
+      "name": "Appetizers",
+      "items": [
+        {
+          "name": "Garlic Parmesan Fries",
+          "description": "Crispy golden fries tossed in garlic butter and Parmesan cheese",
+          "price": "$5.99",
+          "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=300"
+        },
+        {
+          "name": "Buffalo Wings",
+          "description": "Spicy chicken wings served with ranch dip",
+          "price": "$9.49",
+          "image": "https://images.unsplash.com/photo-1608039755401-742074f0548d?w=300"
+        }
+      ]
+    },
+    {
+      "name": "Main Courses",
+      "items": [
+        {
+          "name": "Grilled Salmon",
+          "description": "Fresh Atlantic salmon with lemon butter sauce",
+          "price": "$18.50",
+          "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=300"
+        },
+        {
+          "name": "Ribeye Steak",
+          "description": "12oz ribeye with garlic mashed potatoes",
+          "price": "$29.99",
+          "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=300"
+        }
+      ]
+    },
+    {
+      "name": "Desserts",
+      "items": [
+        {
+          "name": "Chocolate Lava Cake",
+          "description": "Rich chocolate cake with a molten center, served with vanilla ice cream",
+          "price": "$6.75",
+          "image": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=300"
+        }
+      ]
+    }
+  ]
+}
+                        </textarea>
+                    </div>
+                    <div style="font-size: 12px; color: #666; margin-top: 10px;">
+                        <i class="fas fa-lightbulb"></i>
+                        Tip: Our AI can understand various formats - structured text, partial JSON, or even unformatted lists!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template Style Section -->
+            <div class="section">
+                <div class="section-header">
+                    <i class="fas fa-palette"></i>
+                    Template Style
+                </div>
+                <div class="section-content">
+                    <div class="templates-grid">
+                        <div class="template-option active" data-template="classic">
+                            <i class="fas fa-utensils"></i>
+                            <div>Classic</div>
+                        </div>
+                        <div class="template-option" data-template="modern">
+                            <i class="fas fa-mobile-alt"></i>
+                            <div>Modern</div>
+                        </div>
+                        <div class="template-option" data-template="elegant">
+                            <i class="fas fa-crown"></i>
+                            <div>Elegant</div>
+                        </div>
+                        <div class="template-option" data-template="casual">
+                            <i class="fas fa-coffee"></i>
+                            <div>Casual</div>
+                        </div>
+                        <div class="template-option" data-template="fine-dining">
+                            <i class="fas fa-wine-glass"></i>
+                            <div>Fine Dining</div>
+                        </div>
+                        <div class="template-option" data-template="cafe">
+                            <i class="fas fa-cookie-bite"></i>
+                            <div>Cafe</div>
+                        </div>
+                        <div class="template-option" data-template="minimalist">
+                            <i class="fas fa-circle"></i>
+                            <div>Minimalist</div>
+                        </div>
+                        <div class="template-option" data-template="vintage">
+                            <i class="fas fa-feather"></i>
+                            <div>Vintage</div>
+                        </div>
+                        <div class="template-option" data-template="bold">
+                            <i class="fas fa-fire"></i>
+                            <div>Bold</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layout & Grid Section -->
+            <div class="section">
+                <div class="section-header">
+                    <i class="fas fa-th-large"></i>
+                    Grid Layout
+                </div>
+                <div class="section-content">
+                    <div class="grid-layout">
+                        <div class="grid-option active" data-columns="1">
+                            <i class="fas fa-square"></i>
+                            <div>1 Column</div>
+                        </div>
+                        <div class="grid-option" data-columns="2">
+                            <i class="fas fa-columns"></i>
+                            <div>2 Columns</div>
+                        </div>
+                        <div class="grid-option" data-columns="3">
+                            <i class="fas fa-th"></i>
+                            <div>3 Columns</div>
+                        </div>
+                        <div class="grid-option" data-columns="4">
+                            <i class="fas fa-th-large"></i>
+                            <div>4 Columns</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Display Options</label>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span>Show Category Images</span>
+                            <label class="switch">
+                                <input type="checkbox" id="showImages" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span>Show Item Descriptions</span>
+                            <label class="switch">
+                                <input type="checkbox" id="showDescriptions" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Compact Version</span>
+                            <label class="switch">
+                                <input type="checkbox" id="compactMode">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colors & Themes Section -->
+            <div class="section">
+                <div class="section-header">
+                    <i class="fas fa-paint-brush"></i>
+                    Colors & Themes
+                </div>
+                <div class="section-content">
+                    <label class="form-label">Theme Presets</label>
+                    <div class="theme-presets">
+                        <div class="theme-preset active" data-theme="elegant-classic">
+                            <div class="theme-colors">
+                                <div class="theme-color" style="background: #8B4513;"></div>
+                                <div class="theme-color" style="background: #D2691E;"></div>
+                            </div>
+                            <div>Elegant Classic</div>
+                        </div>
+                        <div class="theme-preset" data-theme="modern-blue">
+                            <div class="theme-colors">
+                                <div class="theme-color" style="background: #1e3a8a;"></div>
+                                <div class="theme-color" style="background: #3b82f6;"></div>
+                            </div>
+                            <div>Modern Blue</div>
+                        </div>
+                        <div class="theme-preset" data-theme="rustic-warm">
+                            <div class="theme-colors">
+                                <div class="theme-color" style="background: #92400e;"></div>
+                                <div class="theme-color" style="background: #f59e0b;"></div>
+                            </div>
+                            <div>Rustic Warm</div>
+                        </div>
+                        <div class="theme-preset" data-theme="luxury-gold">
+                            <div class="theme-colors">
+                                <div class="theme-color" style="background: #a16207;"></div>
+                                <div class="theme-color" style="background: #eab308;"></div>
+                            </div>
+                            <div>Luxury Gold</div>
+                        </div>
+                        <div class="theme-preset" data-theme="fresh-green">
+                            <div class="theme-colors">
+                                <div class="theme-color" style="background: #166534;"></div>
+                                <div class="theme-color" style="background: #22c55e;"></div>
+                            </div>
+                            <div>Fresh Green</div>
+                        </div>
+                        <div class="theme-preset" data-theme="oceanic">
+                            <div class="theme-colors">
+                                <div class="theme-color" style="background: #0c4a6e;"></div>
+                                <div class="theme-color" style="background: #0891b2;"></div>
+                            </div>
+                            <div>Oceanic</div>
+                        </div>
+                        <div class="theme-preset" data-theme="sunset">
+                            <div class="theme-colors">
+                                <div class="theme-color" style="background: #dc2626;"></div>
+                                <div class="theme-color" style="background: #f97316;"></div>
+                            </div>
+                            <div>Sunset</div>
+                        </div>
+                        <div class="theme-preset" data-theme="royal-purple">
+                            <div class="theme-colors">
+                                <div class="theme-color" style="background: #581c87;"></div>
+                                <div class="theme-color" style="background: #8b5cf6;"></div>
+                            </div>
+                            <div>Royal Purple</div>
+                        </div>
+                        <div class="theme-preset" data-theme="monochrome">
+                            <div class="theme-colors">
+                                <div class="theme-color" style="background: #374151;"></div>
+                                <div class="theme-color" style="background: #6b7280;"></div>
+                            </div>
+                            <div>Monochrome</div>
+                        </div>
+                        <div class="theme-preset" data-theme="vintage">
+                            <div class="theme-colors">
+                                <div class="theme-color" style="background: #7c2d12;"></div>
+                                <div class="theme-color" style="background: #ea580c;"></div>
+                            </div>
+                            <div>Vintage</div>
+                        </div>
+                    </div>
+
+                    <div class="custom-colors">
+                        <div class="color-input-group">
+                            <input type="color" class="color-input" id="primaryColor" value="#8B4513">
+                            <div>Primary</div>
+                        </div>
+                        <div class="color-input-group">
+                            <input type="color" class="color-input" id="secondaryColor" value="#D2691E">
+                            <div>Secondary</div>
+                        </div>
+                        <div class="color-input-group">
+                            <input type="color" class="color-input" id="backgroundColor" value="#FFF8DC">
+                            <div>Background</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Settings -->
+            <div class="section">
+                <div class="section-header">
+                    <i class="fas fa-cog"></i>
+                    Advanced Styling
+                </div>
+                <div class="section-content">
+                    <div class="form-group">
+                        <label class="form-label">Shadows & Borders</label>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span>Shadow Intensity</span>
+                            <select class="form-control" id="shadowIntensity" style="width: auto;">
+                                <option value="none">None</option>
+                                <option value="light">Light</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="strong">Strong</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Border Style</span>
+                            <select class="form-control" id="borderStyle" style="width: auto;">
+                                <option value="none" selected>None</option>
+                                <option value="solid">Solid</option>
+                                <option value="dashed">Dashed</option>
+                                <option value="dotted">Dotted</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Background Effects</label>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span>Gradient Background</span>
+                            <label class="switch">
+                                <input type="checkbox" id="gradientBg" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span>Texture Overlay</span>
+                            <label class="switch">
+                                <input type="checkbox" id="textureOverlay" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Watermark</span>
+                            <label class="switch">
+                                <input type="checkbox" id="watermark" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="margin-top: 30px;">
+                <button class="btn btn-primary" id="generateBtn" style="width: 100%; margin-bottom: 10px;">
+                    <i class="fas fa-magic"></i>
+                    Generate with AI
+                </button>
+                <button class="btn btn-secondary" id="downloadPdf" style="width: 100%;">
+                    <i class="fas fa-download"></i>
+                    Download PDF
+                </button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <div class="logo">
+                    <i class="fas fa-utensils"></i>
+                    <div>
+                        <h1>AI Menu Generator Pro</h1>
+                        <p>Create beautiful restaurant menus with intelligent parsing</p>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="livePreview">
+                        <i class="fas fa-eye"></i>
+                        Live Preview
+                    </button>
+                </div>
+            </div>
+
+            <div class="preview-container">
+                <div class="preview-header">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-eye"></i>
+                        <span>Live Preview</span>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn" id="zoomOut" style="padding: 5px 10px;"><i class="fas fa-search-minus"></i></button>
+                        <button class="btn" id="zoomReset" style="padding: 5px 10px;">100%</button>
+                        <button class="btn" id="zoomIn" style="padding: 5px 10px;"><i class="fas fa-search-plus"></i></button>
+                    </div>
+                </div>
+                <div class="preview-content" id="previewContent">
+                    <div class="menu-preview theme-elegant-classic" id="menuPreview">
+                        <div class="menu-header">
+                            <h1 class="restaurant-name">The Hungry Fork</h1>
+                            <p class="restaurant-tagline">Where flavor meets comfort</p>
+                            <div class="restaurant-info">
+                                123 Main Street, Springfield, USA<br>
+                                (555) 123-4567
+                            </div>
+                        </div>
+                        <div class="menu-content">
+                            <div class="menu-grid cols-1" id="menuGrid">
+                                <!-- Menu content will be generated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentMenuData = null;
+        let currentTheme = 'elegant-classic';
+        let currentColumns = 1;
+        let currentTemplate = 'classic';
+        let zoomLevel = 1;
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEventListeners();
+            parseAndDisplayMenu();
+        });
+
+        function initializeEventListeners() {
+            // CSV Upload
+            const csvUpload = document.getElementById('csvUpload');
+            const csvFile = document.getElementById('csvFile');
+            
+            csvUpload.addEventListener('click', () => csvFile.click());
+            csvUpload.addEventListener('dragover', handleDragOver);
+            csvUpload.addEventListener('drop', handleFileDrop);
+            csvFile.addEventListener('change', handleFileSelect);
+
+            // Menu data textarea
+            document.getElementById('menuData').addEventListener('input', debounce(parseAndDisplayMenu, 500));
+
+            // Grid layout
+            document.querySelectorAll('.grid-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.grid-option').forEach(o => o.classList.remove('active'));
+                    this.classList.add('active');
+                    currentColumns = parseInt(this.dataset.columns);
+                    updateMenuGrid();
+                });
+            });
+
+            // Template selection
+            document.querySelectorAll('.template-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.template-option').forEach(o => o.classList.remove('active'));
+                    this.classList.add('active');
+                    currentTemplate = this.dataset.template;
+                    applyTemplate();
+                });
+            });
+
+            // Theme selection
+            document.querySelectorAll('.theme-preset').forEach(preset => {
+                preset.addEventListener('click', function() {
+                    document.querySelectorAll('.theme-preset').forEach(p => p.classList.remove('active'));
+                    this.classList.add('active');
+                    currentTheme = this.dataset.theme;
+                    applyTheme();
+                });
+            });
+
+            // Custom colors
+            document.getElementById('primaryColor').addEventListener('change', applyCustomColors);
+            document.getElementById('secondaryColor').addEventListener('change', applyCustomColors);
+            document.getElementById('backgroundColor').addEventListener('change', applyCustomColors);
+
+            // Display options
+            document.getElementById('showImages').addEventListener('change', toggleImages);
+            document.getElementById('showDescriptions').addEventListener('change', toggleDescriptions);
+            document.getElementById('compactMode').addEventListener('change', toggleCompactMode);
+
+            // Generate and download buttons
+            document.getElementById('generateBtn').addEventListener('click', generateWithAI);
+            document.getElementById('downloadPdf').addEventListener('click', downloadPDF);
+
+            // Zoom controls
+            document.getElementById('zoomIn').addEventListener('click', () => adjustZoom(0.1));
+            document.getElementById('zoomOut').addEventListener('click', () => adjustZoom(-0.1));
+            document.getElementById('zoomReset').addEventListener('click', () => resetZoom());
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleFileDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                processFile(file);
+            }
+        }
+
+        function processFile(file) {
+            if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+                Papa.parse(file, {
+                    header: true,
+                    complete: function(results) {
+                        const menuData = convertCSVToMenuData(results.data);
+                        document.getElementById('menuData').value = JSON.stringify(menuData, null, 2);
+                        parseAndDisplayMenu();
+                        showNotification('CSV file processed successfully!', 'success');
+                    },
+                    error: function() {
+                        showNotification('Error processing CSV file', 'error');
+                    }
+                });
+            } else {
+                showNotification('Please upload a CSV file', 'error');
+            }
+        }
+
+        function convertCSVToMenuData(csvData) {
+            const categories = {};
+            
+            csvData.forEach(row => {
+                if (!row.category || !row.name) return;
+                
+                if (!categories[row.category]) {
+                    categories[row.category] = [];
+                }
+                
+                categories[row.category].push({
+                    name: row.name || '',
+                    description: row.description || '',
+                    price: row.price || '',
+                    image: row.image || getDefaultImage()
+                });
+            });
+
+            return {
+                restaurant: {
+                    name: "My Restaurant",
+                    tagline: "Delicious food made fresh",
+                    address: "123 Main Street, City, State",
+                    phone: "(555) 123-4567"
+                },
+                categories: Object.keys(categories).map(name => ({
+                    name,
+                    items: categories[name]
+                }))
+            };
+        }
+
+        function getDefaultImage() {
+            const defaultImages = [
+                'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=300',
+                'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300',
+                'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300',
+                'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=300'
+            ];
+            return defaultImages[Math.floor(Math.random() * defaultImages.length)];
+        }
+
+        function parseAndDisplayMenu() {
+            const menuDataText = document.getElementById('menuData').value.trim();
+            
+            if (!menuDataText) {
+                clearMenu();
+                return;
+            }
+
+            try {
+                // Try to parse as JSON first
+                currentMenuData = JSON.parse(menuDataText);
+                displayMenu(currentMenuData);
+            } catch (e) {
+                // If JSON parsing fails, try intelligent parsing
+                try {
+                    currentMenuData = intelligentParse(menuDataText);
+                    displayMenu(currentMenuData);
+                } catch (parseError) {
+                    showNotification('Unable to parse menu data. Please check the format.', 'error');
+                }
+            }
+        }
+
+        function intelligentParse(text) {
+            // This is a simplified intelligent parser
+            // In a real application, this would be much more sophisticated
+            
+            const lines = text.split('\n').filter(line => line.trim());
+            const categories = [];
+            let currentCategory = null;
+            
+            lines.forEach(line => {
+                line = line.trim();
+                
+                // Check if it's a category (usually in caps or has colon)
+                if (line.toUpperCase() === line || line.endsWith(':') || 
+                    (line.length < 20 && !line.includes('$') && !line.includes('.'))) {
+                    if (currentCategory) {
+                        categories.push(currentCategory);
+                    }
+                    currentCategory = {
+                        name: line.replace(':', ''),
+                        items: []
+                    };
+                } else if (currentCategory && line.includes('$')) {
+                    // Parse item with price
+                    const priceMatch = line.match(/\$[\d.]+/);
+                    const price = priceMatch ? priceMatch[0] : '';
+                    const name = line.replace(/\$[\d.]+/, '').replace(/[-–].*$/, '').trim();
+                    const description = line.replace(/^[^-–]*[-–]/, '').replace(/\$[\d.]+/, '').trim();
+                    
+                    currentCategory.items.push({
+                        name,
+                        description,
+                        price,
+                        image: getDefaultImage()
+                    });
+                }
+            });
+            
+            if (currentCategory) {
+                categories.push(currentCategory);
+            }
+            
+            return {
+                restaurant: {
+                    name: "My Restaurant",
+                    tagline: "Delicious food made fresh",
+                    address: "123 Main Street, City, State",
+                    phone: "(555) 123-4567"
+                },
+                categories
+            };
+        }
+
+        function displayMenu(menuData) {
+            if (!menuData || !menuData.categories) return;
+
+            const menuPreview = document.getElementById('menuPreview');
+            const menuGrid = document.getElementById('menuGrid');
+            
+            // Update restaurant info
+            if (menuData.restaurant) {
+                const restaurantName = menuPreview.querySelector('.restaurant-name');
+                const restaurantTagline = menuPreview.querySelector('.restaurant-tagline');
+                const restaurantInfo = menuPreview.querySelector('.restaurant-info');
+                
+                if (restaurantName) restaurantName.textContent = menuData.restaurant.name || 'My Restaurant';
+                if (restaurantTagline) restaurantTagline.textContent = menuData.restaurant.tagline || 'Delicious food made fresh';
+                if (restaurantInfo) {
+                    restaurantInfo.innerHTML = `
+                        ${menuData.restaurant.address || '123 Main Street, City, State'}<br>
+                        ${menuData.restaurant.phone || '(555) 123-4567'}
+                    `;
+                }
+            }
+
+            // Clear existing content
+            menuGrid.innerHTML = '';
+
+            // Generate menu sections
+            menuData.categories.forEach(category => {
+                const section = document.createElement('div');
+                section.className = 'menu-section';
+                
+                const sectionTitle = document.createElement('h2');
+                sectionTitle.className = 'section-title';
+                sectionTitle.textContent = category.name;
+                section.appendChild(sectionTitle);
+
+                category.items.forEach(item => {
+                    const menuItem = document.createElement('div');
+                    menuItem.className = 'menu-item';
+                    
+                    const showImages = document.getElementById('showImages').checked;
+                    const showDescriptions = document.getElementById('showDescriptions').checked;
+                    
+                    menuItem.innerHTML = `
+                        ${showImages && item.image ? `<img src="${item.image}" alt="${item.name}" class="item-image" onerror="this.src='https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=300'">` : ''}
+                        <div class="item-details">
+                            <div class="item-name">${item.name}</div>
+                            ${showDescriptions && item.description ? `<div class="item-description">${item.description}</div>` : ''}
+                            <div class="item-price">${item.price}</div>
+                        </div>
+                    `;
+                    
+                    section.appendChild(menuItem);
+                });
+
+                menuGrid.appendChild(section);
+            });
+
+            updateMenuGrid();
+            applyTheme();
+        }
+
+        function updateMenuGrid() {
+            const menuGrid = document.getElementById('menuGrid');
+            menuGrid.className = `menu-grid cols-${currentColumns}`;
+        }
+
+        function applyTheme() {
+            const menuPreview = document.getElementById('menuPreview');
+            menuPreview.className = `menu-preview theme-${currentTheme} template-${currentTemplate}`;
+            
+            const compactMode = document.getElementById('compactMode').checked;
+            if (compactMode) {
+                menuPreview.classList.add('compact');
+            }
+        }
+
+        function applyTemplate() {
+            const menuPreview = document.getElementById('menuPreview');
+            // Remove all existing template classes
+            menuPreview.className = menuPreview.className.replace(/template-\w+/g, '').trim();
+            // Add the new template class
+            menuPreview.classList.add(`template-${currentTemplate}`);
+            
+            // Also reapply theme
+            applyTheme();
+        }
+
+        function applyCustomColors() {
+            const primaryColor = document.getElementById('primaryColor').value;
+            const secondaryColor = document.getElementById('secondaryColor').value;
+            const backgroundColor = document.getElementById('backgroundColor').value;
+            
+            const menuPreview = document.getElementById('menuPreview');
+            menuPreview.style.setProperty('--primary-color', primaryColor);
+            menuPreview.style.setProperty('--secondary-color', secondaryColor);
+            menuPreview.style.setProperty('--background-color', backgroundColor);
+        }
+
+        function toggleImages() {
+            parseAndDisplayMenu();
+        }
+
+        function toggleDescriptions() {
+            parseAndDisplayMenu();
+        }
+
+        function toggleCompactMode() {
+            applyTheme();
+        }
+
+        function generateWithAI() {
+            showLoading();
+            
+            // Simulate AI processing
+            setTimeout(() => {
+                const aiGeneratedData = {
+                    restaurant: {
+                        name: "Bella Vista",
+                        tagline: "Authentic Italian Cuisine",
+                        address: "456 Olive Street, Little Italy, NY",
+                        phone: "(555) 987-6543"
+                    },
+                    categories: [
+                        {
+                            name: "Antipasti",
+                            items: [
+                                {
+                                    name: "Bruschetta al Pomodoro",
+                                    description: "Grilled bread topped with fresh tomatoes, basil, and garlic",
+                                    price: "$8.99",
+                                    image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300"
+                                },
+                                {
+                                    name: "Antipasto Misto",
+                                    description: "Selection of cured meats, cheeses, and marinated vegetables",
+                                    price: "$14.99",
+                                    image: "https://images.unsplash.com/photo-1544148103-0773bf10d330?w=300"
+                                }
+                            ]
+                        },
+                        {
+                            name: "Pasta",
+                            items: [
+                                {
+                                    name: "Spaghetti Carbonara",
+                                    description: "Classic Roman pasta with eggs, pancetta, and Parmesan",
+                                    price: "$16.99",
+                                    image: "https://images.unsplash.com/photo-1551892374-ecf8754cf8b0?w=300"
+                                },
+                                {
+                                    name: "Lasagna della Casa",
+                                    description: "Homemade lasagna with meat sauce, ricotta, and mozzarella",
+                                    price: "$18.99",
+                                    image: "https://images.unsplash.com/photo-1574894709920-11b28e7367e3?w=300"
+                                }
+                            ]
+                        },
+                        {
+                            name: "Dolci",
+                            items: [
+                                {
+                                    name: "Tiramisu",
+                                    description: "Classic Italian dessert with coffee-soaked ladyfingers and mascarpone",
+                                    price: "$7.99",
+                                    image: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=300"
+                                }
+                            ]
+                        }
+                    ]
+                };
+                
+                document.getElementById('menuData').value = JSON.stringify(aiGeneratedData, null, 2);
+                currentMenuData = aiGeneratedData;
+                displayMenu(aiGeneratedData);
+                hideLoading();
+                showNotification('Menu generated successfully with AI!', 'success');
+            }, 2000);
+        }
+
+        function downloadPDF() {
+            showLoading();
+            
+            const menuPreview = document.getElementById('menuPreview');
+            const originalScale = menuPreview.style.transform;
+            const originalWidth = menuPreview.style.width;
+            
+            // Optimize for PDF printing
+            menuPreview.style.transform = 'scale(1)';
+            menuPreview.style.width = '210mm'; // A4 width
+            
+            // Add PDF-specific styling
+            const pdfStyle = document.createElement('style');
+            pdfStyle.id = 'pdf-style';
+            pdfStyle.textContent = `
+                .menu-preview { 
+                    box-shadow: none !important; 
+                    border-radius: 0 !important; 
+                    max-width: none !important;
+                }
+                .menu-section { 
+                    page-break-inside: avoid !important; 
+                    break-inside: avoid !important;
+                }
+                .menu-item { 
+                    page-break-inside: avoid !important; 
+                    break-inside: avoid !important;
+                }
+            `;
+            document.head.appendChild(pdfStyle);
+            
+            html2canvas(menuPreview, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                width: 794, // A4 width in pixels at 96 DPI
+                logging: false
+            }).then(canvas => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 295; // A4 height in mm minus margins
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                const imgData = canvas.toDataURL('image/png', 1.0);
+                
+                // First page
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                // Additional pages if needed
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                // Generate filename
+                const restaurantName = currentMenuData?.restaurant?.name || 'Menu';
+                const templateName = currentTemplate.charAt(0).toUpperCase() + currentTemplate.slice(1);
+                const filename = `${restaurantName.replace(/\s+/g, '_')}_${templateName}_Menu.pdf`;
+                
+                pdf.save(filename);
+                
+                // Restore original styles
+                menuPreview.style.transform = originalScale;
+                menuPreview.style.width = originalWidth;
+                document.getElementById('pdf-style')?.remove();
+                
+                hideLoading();
+                showNotification('PDF downloaded successfully!', 'success');
+            }).catch((error) => {
+                console.error('PDF generation error:', error);
+                
+                // Restore original styles on error
+                menuPreview.style.transform = originalScale;
+                menuPreview.style.width = originalWidth;
+                document.getElementById('pdf-style')?.remove();
+                
+                hideLoading();
+                showNotification('Error generating PDF. Please try again.', 'error');
+            });
+        }
+
+        function adjustZoom(delta) {
+            zoomLevel = Math.max(0.5, Math.min(2, zoomLevel + delta));
+            const previewContent = document.getElementById('previewContent');
+            previewContent.style.transform = `scale(${zoomLevel})`;
+            previewContent.style.transformOrigin = 'top center';
+            document.getElementById('zoomReset').textContent = `${Math.round(zoomLevel * 100)}%`;
+        }
+
+        function resetZoom() {
+            zoomLevel = 1;
+            const previewContent = document.getElementById('previewContent');
+            previewContent.style.transform = 'scale(1)';
+            document.getElementById('zoomReset').textContent = '100%';
+        }
+
+        function clearMenu() {
+            document.getElementById('menuGrid').innerHTML = '<div style="text-align: center; color: #666; padding: 40px;">Enter menu data to see preview</div>';
+        }
+
+        function showLoading() {
+            document.getElementById('loading').classList.add('show');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.remove('show');
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create a simple notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 6px;
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#007bff'};
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Add CSS animations for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
